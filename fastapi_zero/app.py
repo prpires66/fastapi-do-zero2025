@@ -8,7 +8,12 @@ from sqlalchemy.orm import Session
 
 from fastapi_zero.database import get_session
 from fastapi_zero.models import User
-from fastapi_zero.schemas import Message, UserList, UserPublic, UserSchema
+from fastapi_zero.schemas import (
+    Message,
+    UserList,
+    UserPublic,
+    UserSchema,
+)
 from fastapi_zero.security import get_password_hash
 
 app = FastAPI(title='FastAPI Zero', version='0.1.0')
@@ -133,3 +138,4 @@ def login_for_access_token(
             detail='Incorrect email or password',
             headers={'WWW-Authenticate': 'Bearer'},
         )
+    return {'access_token': user.email, 'token_type': 'bearer'}

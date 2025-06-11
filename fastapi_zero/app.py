@@ -14,7 +14,11 @@ from fastapi_zero.schemas import (
     UserPublic,
     UserSchema,
 )
-from fastapi_zero.security import get_password_hash
+from fastapi_zero.security import (
+    create_access_token,
+    get_password_hash,
+    verify_password,
+)
 
 app = FastAPI(title='FastAPI Zero', version='0.1.0')
 
@@ -126,16 +130,19 @@ def login_for_access_token(
     session: Session = Depends(get_session),
 ):
     user = session.scalar(select(User).where(User.email == form_data.username))
+
     if not user:
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
             detail='Incorrect email or password',
-            headers={'WWW-Authenticate': 'Bearer'},
         )
-    if not user.verify_password(form_data.password, user.password):
+
+    if not verify_password(form_data.password, user.password):
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
             detail='Incorrect email or password',
-            headers={'WWW-Authenticate': 'Bearer'},
         )
-    return {'access_token': user.email, 'token_type': 'bearer'}
+
+    access_token = create_access_token(data={'sub': user.email})
+
+    return {'access_token': access_token, 'token_type': 'bearer'}

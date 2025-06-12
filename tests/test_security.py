@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from jwt import decode
 
 from fastapi_zero.security import (
@@ -14,3 +16,12 @@ def test_jwt():
     decoded = decode(token, SECRET_KEY, algorithms=ALGORITHM)
     assert decoded['test'] == data['test']
     assert 'exp' in decoded
+
+
+def test_jwt_invalid_token(client):
+    response = client.delete(
+        '/users/666',
+        headers={'Authorization': 'Bearer invalid_token'},
+    )
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Could not validate credentials'}

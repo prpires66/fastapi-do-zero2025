@@ -43,6 +43,7 @@ extend-exclude = [
     "W",
     "PL",
     "PT",
+    "FAST"
  ]
 
  [tool.ruff.format]
